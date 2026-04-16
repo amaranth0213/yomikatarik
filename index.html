@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>絵本読み語りボランティア 担当クラス表作成ツール</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--gd:#2d6a4f;--gm:#40916c;--gl:#b7e4c7;--gp:#d8f3dc;--gb:#f0faf3;--td:#1b4332;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Meiryo',sans-serif;background:var(--gb);}
+.header{background:var(--gd);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px;}
+.hi{font-size:1.8rem;}.ht{font-size:1.1rem;font-weight:700;}.hs{font-size:.8rem;opacity:.85;margin-top:2px;}
+.stepper{max-width:480px;margin:0 auto;display:flex;align-items:center;padding:14px 10px 4px;}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;}
+.sc{width:32px;height:32px;border-radius:50%;background:#ccc;color:#fff;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;}
+.step.active .sc{background:var(--gd);}.step.done .sc{background:var(--gm);}
+.sl{font-size:.65rem;color:#888;margin-top:3px;text-align:center;line-height:1.3;}
+.step.active .sl,.step.done .sl{color:var(--gd);font-weight:600;}
+.sline{flex:1;height:2px;background:#ccc;margin-top:-16px;}.sline.done{background:var(--gm);}
+.wrap{max-width:480px;margin:0 auto;padding:0 14px;}
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(45,106,79,.1);padding:20px 16px;margin:12px 0 0;}
+.ct{font-size:1rem;font-weight:700;color:var(--td);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.hint{font-size:.8rem;color:#888;margin-bottom:8px;}
+.date-input{width:100%;padding:14px;font-size:1.05rem;text-align:center;border:2px solid var(--gl);border-radius:10px;background:var(--gp);color:var(--td);font-weight:600;outline:none;font-family:inherit;}
+.srow{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.slbl{font-size:.88rem;color:var(--td);min-width:75px;}
+.ni{width:68px;padding:7px;text-align:center;border:2px solid var(--gl);border-radius:8px;font-size:.95rem;font-family:inherit;color:var(--td);outline:none;}
+.tinfo{font-size:.8rem;color:#888;margin-top:6px;}
+.tinputs{display:flex;align-items:center;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.ti{width:72px;padding:7px 5px;text-align:center;border:2px solid var(--gl);border-radius:8px;font-size:.88rem;font-family:inherit;color:var(--td);outline:none;}
+.mcontrols{display:flex;gap:8px;margin-bottom:10px;}
+.bto{padding:6px 14px;border-radius:20px;border:2px solid var(--gm);background:#fff;color:var(--gd);font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:350px;overflow-y:auto;}
+.mi{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;border:2px solid #e0e0e0;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--td);user-select:none;background:#fff;}
+.mi.sel{border-color:var(--gm);background:var(--gp);}
+.mi input[type=checkbox]{accent-color:var(--gm);width:17px;height:17px;flex-shrink:0;}
+.badge{display:inline-block;background:var(--gp);color:var(--gd);border-radius:20px;padding:2px 10px;font-size:.85rem;font-weight:700;margin-left:6px;}
+.agrid{display:grid;gap:7px;max-height:400px;overflow-y:auto;}
+.arow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;background:var(--gp);border-radius:10px;padding:9px 12px;}
+.aname{font-weight:700;color:var(--td);font-size:.88rem;}
+.asel{padding:6px 8px;border-radius:8px;border:1.5px solid var(--gl);background:#fff;font-size:.85rem;font-family:inherit;color:var(--td);outline:none;cursor:pointer;}
+.bm{width:100%;margin:12px 0 0;padding:16px;background:var(--gd);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.bm:disabled{background:#aaa;cursor:not-allowed;}
+.bb{width:100%;margin:8px 0 0;padding:13px;background:#fff;color:var(--gd);border:2px solid var(--gm);border-radius:12px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;}
+.bp{width:100%;margin:8px 0 0;padding:14px;background:var(--gm);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.br{width:100%;margin:8px 0 20px;padding:13px;background:#fff;color:var(--gd);border:2px solid var(--gm);border-radius:12px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;}
+.sbox{background:var(--gp);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.9rem;color:var(--td);}
+.sbox strong{color:var(--gd);}
+.hidden{display:none;}
+.pdf-note{font-size:.78rem;color:#888;text-align:center;margin-top:6px;line-height:1.5;padding:0 10px;}
+
+/* 印刷用テーブル（画像化対象） */
+#printArea{
+  background:#fff;
+  padding:16px;
+  font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;
+}
+#printArea .pa-date-row{display:flex;align-items:center;gap:4px;margin-bottom:8px;}
+#printArea .pa-dc{border:1.5px solid #000;padding:4px 14px;font-size:15px;font-weight:bold;}
+#printArea .pa-time{font-size:11px;color:#333;margin-bottom:10px;}
+#printArea table{border-collapse:collapse;width:100%;}
+#printArea table th,#printArea table td{border:1.5px solid #000;padding:8px 10px;text-align:center;vertical-align:middle;font-size:13px;}
+#printArea table th{background:#2d6a4f;color:#fff;font-size:14px;font-weight:bold;}
+#printArea table .kc{font-size:14px;font-weight:bold;background:#f5f5f5;}
+#printArea table .dth{position:relative;width:60px;height:44px;background:#f5f5f5;padding:0;}
+#printArea table .dth svg{position:absolute;top:0;left:0;width:100%;height:100%;}
+#printArea table .dth .dy{position:absolute;bottom:3px;right:5px;font-size:9px;color:#555;}
+#printArea table .dth .dk{position:absolute;top:3px;left:5px;font-size:9px;color:#555;}
+#printArea table td{min-height:40px;}
+.pvwrap{overflow-x:auto;margin-top:6px;}
+.pvt{width:100%;border-collapse:collapse;font-size:.8rem;}
+.pvt th,.pvt td{border:1px solid #ccc;padding:6px 8px;text-align:center;vertical-align:middle;}
+.pvt th{background:var(--gd);color:#fff;}
+.pvt .rh{background:#f5f5f5;font-weight:700;}
+.pvt .dc{position:relative;padding:0;min-width:50px;height:40px;background:#f5f5f5;}
+.pvt .dc svg{position:absolute;top:0;left:0;width:100%;height:100%;}
+.pvt .dc .dy{position:absolute;bottom:2px;right:4px;font-size:.6rem;color:#666;}
+.pvt .dc .dk{position:absolute;top:2px;left:4px;font-size:.6rem;color:#666;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hi">📚</div>
+  <div><div class="ht">絵本読み語りボランティア</div><div class="hs">担当クラス表作成ツール</div></div>
+</div>
+<div class="stepper" id="stepper">
+  <div class="step active" id="s1"><div class="sc" id="sc1">1</div><div class="sl">日<br>付</div></div>
+  <div class="sline" id="sl1"></div>
+  <div class="step" id="s2"><div class="sc" id="sc2">2</div><div class="sl">参加<br>者</div></div>
+  <div class="sline" id="sl2"></div>
+  <div class="step" id="s3"><div class="sc" id="sc3">3</div><div class="sl">クラス<br>割当</div></div>
+  <div class="sline" id="sl3"></div>
+  <div class="step" id="s4"><div class="sc" id="sc4">4</div><div class="sl">完<br>成</div></div>
+</div>
+
+<!-- Page1 -->
+<div id="page1" class="wrap">
+  <div class="card">
+    <div class="ct">📅 今回の読み語りの日付</div>
+    <input class="date-input" type="date" id="dateInput">
+    <div class="tinfo">集合時間・読み語り時間（任意）</div>
+    <div class="tinputs">
+      <span style="font-size:.82rem;color:#555;">集合</span>
+      <input class="ti" type="time" id="gatherTime" value="08:10">
+      <span style="font-size:.82rem;color:#555;">読み語り</span>
+      <input class="ti" type="time" id="startTime" value="08:20">
+      <span style="font-size:.82rem;color:#555;">〜</span>
+      <input class="ti" type="time" id="endTime" value="08:35">
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">⚙️ クラス構成の設定</div>
+    <div class="hint">学年数・組数を入力してください</div>
+    <div class="srow"><span class="slbl">学年数</span><input class="ni" type="number" id="yearCount" value="3" min="1" max="6"><span style="font-size:.88rem;color:#555;">年</span></div>
+    <div class="srow"><span class="slbl">組数</span><input class="ni" type="number" id="kumiCount" value="7" min="1" max="12"><span style="font-size:.88rem;color:#555;">組</span></div>
+  </div>
+  <button class="bm" onclick="goStep2()">次へ　参加者を選ぶ →</button>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- Page2 -->
+<div id="page2" class="wrap hidden">
+  <div class="card">
+    <div class="ct">👋 今回参加するメンバー <span class="badge" id="countBadge">0人</span></div>
+    <div class="hint">今回参加できる人にチェックを入れてください</div>
+    <div class="mcontrols">
+      <button class="bto" onclick="selectAll()">全員選択</button>
+      <button class="bto" onclick="clearAll()">全解除</button>
+    </div>
+    <div class="mgrid" id="memberGrid"></div>
+  </div>
+  <button class="bm" id="btnStep3" onclick="goStep3()" disabled>次へ　クラスを割り当てる →</button>
+  <button class="bb" onclick="goStep1()">← 戻る</button>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- Page3 -->
+<div id="page3" class="wrap hidden">
+  <div class="card">
+    <div class="ct">🏫 担当クラスを割り当てる</div>
+    <div class="hint">各メンバーの担当クラスを選んでください</div>
+    <div class="agrid" id="assignGrid"></div>
+  </div>
+  <button class="bm" onclick="goStep4()">表を完成させる ✨</button>
+  <button class="bb" onclick="goStep2()">← 戻る</button>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- Page4 -->
+<div id="page4" class="wrap hidden">
+  <div class="card">
+    <div class="ct">🎉 担当表が完成しました！</div>
+    <div class="sbox" id="summaryBox"></div>
+    <div class="pvwrap"><table class="pvt" id="previewTable"></table></div>
+  </div>
+  <button class="bp" id="btnPdf" onclick="savePDF()">📄 画像として保存（PDF用）</button>
+  <div class="pdf-note" id="pdfNote">ボタンを押すと表が画像で保存されます。<br>iOSでは「写真に追加」→ 印刷アプリでPDFにできます。</div>
+  <button class="bb" onclick="goStep3()">← 戻る（修正する）</button>
+  <button class="br" onclick="resetAll()">🔄 最初からやり直す</button>
+</div>
+
+<!-- 画像化用の非表示エリア -->
+<div id="printArea" style="position:fixed;left:-9999px;top:0;width:900px;"></div>
+
+<script>
+var MEMBERS = ["安藤三知代","永野陽子","加藤由美子","胡桃沢園恵","光本実加","三遊亭赤福","山下ひろみ","氏家由香利","児玉裕子","章田木未","柴田友彩","射り口美代子","松岡須美子","松本真実","深尾美穂子","須賀はる子","青山和子","村山雄司","渡辺陽子","土田綾乃","徳永早苗","鈴木康子","鈴木芳子","蛯名さやか","安藤順","先生１","先生２","先生３","先生４","校長先生","高木雅美"];
+var selectedMembers = [];
+var assignMap = {};
+var state = {date:'',gatherTime:'',startTime:'',endTime:'',years:3,kumis:7};
+
+document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+
+function setStep(n) {
+  for (var i = 1; i <= 4; i++) {
+    document.getElementById('s'+i).className = 'step'+(i===n?' active':i<n?' done':'');
+    document.getElementById('sc'+i).textContent = i<n?'✓':String(i);
+    if(i<4) document.getElementById('sl'+i).className = 'sline'+(i<n?' done':'');
+  }
+  var pages=['page1','page2','page3','page4'];
+  for(var j=0;j<pages.length;j++) document.getElementById(pages[j]).className=(j+1===n?'wrap':'wrap hidden');
+  window.scrollTo(0,0);
+}
+
+function fmtDate(s){
+  if(!s)return{y:'',m:'',d:''};
+  var p=s.split('-');
+  return{y:p[0].m:String(parseInt(p[1])),d:String(parseInt(p[2]))};
+}
+function fmtTime(t){
+  if(!t)return'';
+  var p=t.split(':');
+  return p[0]+'時'+p[1]+'分';
+}
+
+function goStep1(){setStep(1);}
+function goStep2(){
+  state.date=document.getElementById('dateInput').value;
+  state.gatherTime=document.getElementById('gatherTime').value;
+  state.startTime=document.getElementById('startTime').value;
+  state.endTime=document.getElementById('endTime').value;
+  state.years=parseInt(document.getElementById('yearCount').value)||3;
+  state.kumis=parseInt(document.getElementById('kumiCount').value)||7;
+  buildMemberGrid();setStep(2);
+}
+function buildMemberGrid(){
+  var g=document.getElementById('memberGrid');g.innerHTML='';
+  for(var i=0;i<MEMBERS.length;i++){
+    var m=MEMBERS[i];var sel=selectedMembers.indexOf(m)>=0;
+    var div=document.createElement('div');
+    div.className='mi'+(sel?' sel':'');
+    div.innerHTML='<input type="checkbox"'+(sel?' checked':'')+'><span>'+m+'</span>';
+    div.onclick=makeMemberClick(m,div);
+    g.appendChild(div);
+  }updateCount();
+}
+function makeMemberClick(name,el){
+  return function(){
+    var cb=el.querySelector('input');var idx=selectedMembers.indexOf(name);
+    if(idx>=0){selectedMembers.splice(idx,1);cb.checked=false;el.classList.remove('sel');}
+    else{selectedMembers.push(name);cb.checked=true;el.classList.add('sel');}
+    updateCount();
+  };
+}
+function updateCount(){
+  document.getElementById('countBadge').textContent=selectedMembers.length+'人';
+  document.getElementById('btnStep3').disabled=selectedMembers.length===0;
+}
+function selectAll(){selectedMembers=MEMBERS.slice();buildMemberGrid();}
+function clearAll(){selectedMembers=[];buildMemberGrid();}
+function goStep3(){
+  var g=document.getElementById('assignGrid');g.innerHTML='';
+  var opts=[{l:'（未割当）',v:''}];
+  for(var y=1;y<=state.years;y++)for(var k=1;k<=state.kumis;k++)opts.push({l:y+'年'+k+'組',v:y+'-'+k});
+  opts.push({l:'なし',v:'なし'});
+  for(var i=0;i<selectedMembers.length;i++){
+    var m=selectedMembers[i];var prev=assignMap[m]||'';
+    var row=document.createElement('div');row.className='arow';
+    var os='';
+    for(var j=0;j<opts.length;j++)os+='<option value="'+opts[j].v+'"'+(prev===opts[j].v?' selected':'')+'>'+opts[j].l+'</option>';
+    row.innerHTML='<div class="aname">'+m+'</div><span style="color:var(--gm);">→</span><select class="asel" data-name="'+m+'">'+os+'</select>';
+    g.appendChild(row);
+  }setStep(3);
+}
+function buildGrid(){
+  var g={};
+  for(var k=1;k<=state.kumis;k++){g[k]={};for(var y=1;y<=state.years;y++)g[k][y]='';}
+  for(var i=0;i<selectedMembers.length;i++){
+    var m=selectedMembers[i];var v=assignMap[m]||'';
+    if(v&&v!=='なし'){var p=v.split('-');var yr=parseInt(p[0]);var km=parseInt(p[1]);
+      if(yr>=1&&yr<=state.years&&km>=1&&km<=state.kumis)g[km][yr]=m;}
+  }return g;
+}
+function goStep4(){
+  assignMap={};
+  var sels=document.querySelectorAll('.asel');
+  for(var i=0;i<sels.length;i++)assignMap[sels[i].getAttribute('data-name')]=sels[i].value;
+  buildPreview();buildPrintArea();setStep(4);
+  var dj=fmtDate(state.date);
+  document.getElementById('summaryBox').innerHTML='<strong>'+dj.y+'年'+dj.m+'月'+dj.d+'日</strong>　参加者 <strong>'+selectedMembers.length+'人</strong>';
+}
+function buildPreview(){
+  var grid=buildGrid();var tbl=document.getElementById('previewTable');
+  var h='<thead><tr><th class="dc"><svg><line x1="0" y1="0" x2="100%" y2="100%" stroke="#aaa" stroke-width="1"/></svg><span class="dk">組</span><span class="dy">年</span></th>';
+  for(var y=1;y<=state.years;y++)h+='<th>'+y+'年</th>';
+  h+='</tr></thead><tbody>';
+  for(var k=1;k<=state.kumis;k++){
+    h+='<tr><td class="rh">'+k+'組</td>';
+    for(var y2=1;y2<=state.years;y2++){var n=grid[k][y2];h+='<td>'+(n?n:'<span style="color:#ccc;">-</span>')+'</td>';}
+    h+='</tr>';
+  }tbl.innerHTML=h+'</tbody>';
+}
+
+function buildPrintArea(){
+  var grid=buildGrid();var dj=fmtDate(state.date);
+  var timeStr='';
+  if(state.gatherTime)timeStr+='集合時間 '+fmtTime(state.gatherTime)+'　';
+  if(state.startTime&&state.endTime)timeStr+=fmtTime(state.startTime)+'から'+fmtTime(state.endTime)+'まで';
+
+  var html='<div class="pa-date-row">';
+  html+='<span class="pa-dc">'+dj.y+'年</span><span class="pa-dc">'+dj.m+'月</span><span class="pa-dc">'+dj.d+'日</span>';
+  html+='</div>';
+  if(timeStr)html+='<div class="pa-time">'+timeStr+'</div>';
+  html+='<table><thead><tr><th class="dth"><svg><line x1="0" y1="0" x2="100%" y2="100%" stroke="black" stroke-width="1.5"/></svg><span class="dy">年</span><span class="dk">組</span></th>';
+  for(var y=1;y<=state.years;y++)html+='<th>'+y+'年</th>';
+  html+='</tr></thead><tbody>';
+  for(var k=1;k<=state.kumis;k++){
+    html+='<tr><td class="kc">'+k+'組</td>';
+    for(var y2=1;y2<=state.years;y2++){
+      var n=grid[k][y2];
+      html+='<td>'+(n?n:'<span style="color:#bbb;">なし</span>')+'</td>';
+    }html+='</tr>';
+  }html+='</tbody></table>';
+  document.getElementById('printArea').innerHTML=html;
+}
+
+function savePDF(){
+  var btn=document.getElementById('btnPdf');
+  var note=document.getElementById('pdfNote');
+  btn.disabled=true;
+  btn.textContent='⏳ 画像を作成中...';
+  note.textContent='しばらくお待ちください…';
+
+  var el=document.getElementById('printArea');
+  html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false}).then(function(canvas){
+    var imgData=canvas.toDataURL('image/png');
+    var dj=fmtDate(state.date);
+
+    var win=window.open('','_blank');
+    if(win){
+      win.document.write('<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>担当表</title></head><body style="margin:0;background:#eee;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:sans-serif;">');
+      win.document.write('<p style="margin-bottom:12px;font-size:14px;color:#333;">📸 画像を長押し→「写真に保存」してください</p>');
+      win.document.write('<img src="'+imgData+'" style="width:100%;max-width:800px;border:1px solid #ccc;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2);">');
+      win.document.write('<p style="margin-top:12px;font-size:12px;color:#888;">写真アプリから印刷→PDFで保存できます</p>');
+      win.document.write('</' + 'body></' + 'html>');
+      win.document.close();
+      btn.textContent='📄 画像として保存（PDF用）';
+      note.textContent='新しい画面が開きました。画像を長押しして保存してください。';
+    } else {
+      var a=document.createElement('a');
+      a.href=imgData;
+      a.download='読み語り担当表_'+dj.y+dj.m+'月'+dj.d+'日.png';
+      a.click();
+      btn.textContent='📄 画像として保存（PDF用）';
+      note.textContent='画像がダウンロードされました！';
+    }
+    btn.disabled=false;
+  }).catch(function(err){
+    btn.disabled=false;
+    btn.textContent='📄 画像として保存（PDF用）';
+    note.textContent='エラーが発生しました。もう一度お試しください。';
+  });
+}
+
+function resetAll(){
+  selectedMembers=[];assignMap={};
+  document.getElementById('dateInput').value=new Date().toISOString().split('T')[0];
+  setStep(1);
+}
+setStep(1);
+</script>
+</body>
+</html>
