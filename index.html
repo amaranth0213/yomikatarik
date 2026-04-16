@@ -186,7 +186,7 @@ function setStep(n) {
 function fmtDate(s){
   if(!s)return{y:'',m:'',d:''};
   var p=s.split('-');
-  return{y:p[0].m:String(parseInt(p[1])),d:String(parseInt(p[2]))};
+  return{y:p[0],m:String(parseInt(p[1])),d:String(parseInt(p[2]))};
 }
 function fmtTime(t){
   if(!t)return'';
