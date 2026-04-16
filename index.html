@@ -132,6 +132,7 @@ body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Meiryo',sans-serif;
     <div class="mgrid" id="memberGrid"></div>
   </div>
   <button class="bm" id="btnStep3" onclick="goStep3()" disabled>次へ　クラスを割り当てる →</button>
+  <button class="bp" id="btnParticipantSave" onclick="saveParticipantList()" disabled>👥 参加者一覧表を保存</button>
   <button class="bb" onclick="goStep1()">← 戻る</button>
   <div style="height:20px;"></div>
 </div>
@@ -163,9 +164,11 @@ body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Meiryo',sans-serif;
 
 <!-- 画像化用の非表示エリア -->
 <div id="printArea" style="position:fixed;left:-9999px;top:0;width:900px;"></div>
+<!-- 参加者一覧用の非表示エリア -->
+<div id="participantPrintArea" style="position:fixed;left:-9999px;top:0;width:600px;"></div>
 
 <script>
-var MEMBERS = ["安藤三知代","永野陽子","加藤由美子","胡桃沢園恵","光本実加","三遊亭赤福","山下ひろみ","氏家由香利","児玉裕子","章田木未","柴田友彩","射り口美代子","松岡須美子","松本真実","深尾美穂子","須賀はる子","青山和子","村山雄司","渡辺陽子","土田綾乃","徳永早苗","鈴木康子","鈴木芳子","蛯名さやか","安藤順","先生１","先生２","先生３","先生４","校長先生","高木雅美"];
+var MEMBERS = ["安藤三知代","永野陽子","加藤由美子","胡桃沢園恵","光本実加","三遊亭赤福","山下ひろみ","氏家由香利","児玉裕子","篠田木未","柴田友彩","射り口美代子","松岡須美子","松本真実","深尾美穂子","須賀はる子","青山和子","村山雄司","渡辺陽子","土田綾乃","徳永早苗","鈴木康子","鈴木芳子","蛯名さやか","安藤順","先生１","先生２","先生３","先生４","校長先生","高木雅美"];
 var selectedMembers = [];
 var assignMap = {};
 var state = {date:'',gatherTime:'',startTime:'',endTime:'',years:3,kumis:7};
@@ -191,7 +194,7 @@ function fmtDate(s){
 function fmtTime(t){
   if(!t)return'';
   var p=t.split(':');
-  return p[0]+'時'+p[1]+'分';
+  return p[0]+'を'+p[1]+'分';
 }
 
 function goStep1(){setStep(1);}
@@ -224,8 +227,9 @@ function makeMemberClick(name,el){
   };
 }
 function updateCount(){
-  document.getElementById('countBadge').textContent=selectedMembers.length+'人';
+  document.getElementById('countBadge').textContent=selectedMembers.length+'��';
   document.getElementById('btnStep3').disabled=selectedMembers.length===0;
+  document.getElementById('btnParticipantSave').disabled=selectedMembers.length===0;
 }
 function selectAll(){selectedMembers=MEMBERS.slice();buildMemberGrid();}
 function clearAll(){selectedMembers=[];buildMemberGrid();}
@@ -323,13 +327,60 @@ function savePDF(){
       a.download='読み語り担当表_'+dj.y+dj.m+'月'+dj.d+'日.png';
       a.click();
       btn.textContent='📄 画像として保存（PDF用）';
-      note.textContent='画像がダウンロードされました！';
+      note.textContent='画像がダウンロc��ドされました！';
     }
     btn.disabled=false;
   }).catch(function(err){
     btn.disabled=false;
     btn.textContent='📄 画像として保存（PDF用）';
     note.textContent='エラーが発生しました。もう一度お試しください。';
+  });
+}
+
+function saveParticipantList(){
+  var btn=document.getElementById('btnParticipantSave');
+  btn.disabled=true;btn.textContent='⏳ 作成中...';
+  var d=state.date||document.getElementById('dateInput').value;
+  var dj=fmtDate(d);
+  var dateStr=dj.y?dj.y+'年'+dj.m+'月'+dj.d+'日':'';
+  var html='<div style="padding:24px;font-family:\'Hiragino Kaku Gothic ProN\',\'Meiryo\',sans-serif;">';
+  html+='<div style="text-align:center;font-size:18px;font-weight:bold;border-bottom:2px solid #2d6a4f;padding-bottom:8px;margin-bottom:6px;">絵本読み語りボランティア</div>';
+  html+='<div style="text-align:center;font-size:15px;font-weight:bold;margin-bottom:12px;">参加者一覧</div>';
+  if(dateStr)html+='<div style="text-align:center;font-size:14px;margin-bottom:4px;">'+dateStr+'</div>';
+  html+='<div style="text-align:center;font-size:13px;color:#555;margin-bottom:16px;">参加者 '+selectedMembers.length+'名</div>';
+  html+='<table style="width:100%;border-collapse:collapse;">';
+  var cols=3;
+  for(var i=0;i<selectedMembers.length;i+=cols){
+    html+='<tr>';
+    for(var j=0;j<cols;j++){
+      var idx=i+j;
+      if(idx<selectedMembers.length){
+        html+='<td style="border:1.5px solid #000;padding:9px 12px;font-size:14px;">'+(idx+1)+'．'+selectedMembers[idx]+'</td>';
+      }else{
+        html+='<td style="border:1.5px solid #000;padding:9px 12px;"></td>';
+      }
+    }
+    html+='</tr>';
+  }
+  html+='</table></div>';
+  document.getElementById('participantPrintArea').innerHTML=html;
+  html2canvas(document.getElementById('participantPrintArea'),{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false}).then(function(canvas){
+    var imgData=canvas.toDataURL('image/png');
+    var win=window.open('','_blank');
+    if(win){
+      win.document.write('<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>参加者一覧</title></head><body style="margin:0;background:#eee;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:sans-serif;">');
+      win.document.write('<p style="margin-bottom:12px;font-size:14px;color:#333;">📸 画像を長押し→「写真に保存」してください</p>');
+      win.document.write('<img src="'+imgData+'" style="width:100%;max-width:600px;border:1px solid #ccc;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2);">');
+      win.document.write('<p style="margin-top:12px;font-size:12px;color:#888;">写真アプリから印刷→PDFで保存できます</p>');
+      win.document.write('</'+'body></'+'html>');
+      win.document.close();
+    }else{
+      var a=document.createElement('a');a.href=imgData;
+      a.download='参加者一覧.png';a.click();
+    }
+    btn.disabled=false;btn.textContent='👥 参加者一覧表を保存';
+  }).catch(function(){
+    btn.disabled=false;btn.textContent='👥 参加者一覧表を保存';
   });
 }
 
