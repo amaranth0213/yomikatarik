@@ -168,7 +168,7 @@ body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP','Meiryo',sans-serif;
 <div id="participantPrintArea" style="position:fixed;left:-9999px;top:0;width:600px;"></div>
 
 <script>
-var MEMBERS = ["安藤三知代","永野陽子","加藤由美子","胡桃沢園恵","光本実加","三遊亭赤福","山下ひろみ","氏家由香利","児玉裕子","篠田木未","柴田友彩","射り口美代子","松岡須美子","松本真実","深尾美穂子","須賀はる子","青山和子","村山雄司","渡辺陽子","土田綾乃","徳永早苗","鈴木康子","鈴木芳子","蛯名さやか","安藤順","先生１","先生２","先生３","先生４","校長先生","高木雅美"];
+var MEMBERS = ["安藤三知代","永野陽子","加藤由美子","胡桃沢園恵","光本実加","三遊亭赤福","山下ひろみ","氏家由香利","児玉裕子","章田木未","柴田友彩","射り口美代子","松岡須美子","松本真実","深尾美穂子","須賀はる子","青山和子","村山雄司","渡辺陽子","土田綾乃","徳永早苗","鈴木康子","鈴木芳子","蛯名さやか","安藤順","先生１","先生２","先生３","先生４","校長先生","高木雅美"];
 var selectedMembers = [];
 var assignMap = {};
 var state = {date:'',gatherTime:'',startTime:'',endTime:'',years:3,kumis:7};
@@ -194,7 +194,7 @@ function fmtDate(s){
 function fmtTime(t){
   if(!t)return'';
   var p=t.split(':');
-  return p[0]+'を'+p[1]+'分';
+  return p[0]+'時'+p[1]+'分';
 }
 
 function goStep1(){setStep(1);}
@@ -227,7 +227,7 @@ function makeMemberClick(name,el){
   };
 }
 function updateCount(){
-  document.getElementById('countBadge').textContent=selectedMembers.length+'��';
+  document.getElementById('countBadge').textContent=selectedMembers.length+'人';
   document.getElementById('btnStep3').disabled=selectedMembers.length===0;
   document.getElementById('btnParticipantSave').disabled=selectedMembers.length===0;
 }
@@ -245,7 +245,28 @@ function goStep3(){
     for(var j=0;j<opts.length;j++)os+='<option value="'+opts[j].v+'"'+(prev===opts[j].v?' selected':'')+'>'+opts[j].l+'</option>';
     row.innerHTML='<div class="aname">'+m+'</div><span style="color:var(--gm);">→</span><select class="asel" data-name="'+m+'">'+os+'</select>';
     g.appendChild(row);
-  }setStep(3);
+  }
+  var sels=document.querySelectorAll('.asel');
+  for(var s=0;s<sels.length;s++)sels[s].addEventListener('change',updateAssignSelects);
+  updateAssignSelects();
+  setStep(3);
+}
+function updateAssignSelects(){
+  var sels=document.querySelectorAll('.asel');
+  var taken={};
+  for(var i=0;i<sels.length;i++){var v=sels[i].value;if(v&&v!=='なし'&&v!=='')taken[v]=true;}
+  for(var i=0;i<sels.length;i++){
+    var myVal=sels[i].value;
+    var opts=sels[i].options;
+    for(var j=0;j<opts.length;j++){
+      var ov=opts[j].value;
+      if(ov&&ov!=='なし'&&ov!==''&&ov!==myVal&&taken[ov]){
+        opts[j].disabled=true;opts[j].style.color='#ccc';
+      }else{
+        opts[j].disabled=false;opts[j].style.color='';
+      }
+    }
+  }
 }
 function buildGrid(){
   var g={};
@@ -327,13 +348,13 @@ function savePDF(){
       a.download='読み語り担当表_'+dj.y+dj.m+'月'+dj.d+'日.png';
       a.click();
       btn.textContent='📄 画像として保存（PDF用）';
-      note.textContent='画像がダウンロc��ドされました！';
+      note.textContent='画像がダウンロードされました！';
     }
     btn.disabled=false;
   }).catch(function(err){
     btn.disabled=false;
     btn.textContent='📄 画像として保存（PDF用）';
-    note.textContent='エラーが発生しました。もう一度お試しください。';
+    note.textContent='エラーが発生しました。もぇ一度お試しください。';
   });
 }
 
